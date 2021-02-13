@@ -1,35 +1,44 @@
-import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { channels } from '../shared/constants';
-const { ipcRenderer } = window; 
+import {useState, useEffect} from "react";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      appName: '',
-      appVersion: '',
-    }
+const { ipcRenderer } = window;
+
+function App() {
+  const [appInfo,setAppInfo] = useState({
+    appName: '',
+    appVersion: ''
+  })
+
+  useEffect(() => {
     ipcRenderer.send(channels.APP_INFO);
+
     ipcRenderer.on(channels.APP_INFO, (event, arg) => {
       ipcRenderer.removeAllListeners(channels.APP_INFO);
       const { appName, appVersion } = arg;
-      this.setState({ appName, appVersion });
+      setAppInfo({ appName, appVersion });
     });
-  }
+  }, [])
 
-  render() {
-    const { appName, appVersion } = this.state;
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>{appName} version {appVersion}</p>
-        </header>
-      </div>
-    );
-  }
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          {appInfo.appName} version {appInfo.appVersion}
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
 }
 
 export default App;
